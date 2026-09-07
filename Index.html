@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de TCC • CETEP/LNAB — Relatórios de Submissão e Acompanhamento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-navy: #12345b;
+      --navy-dark: #0a1f38;
+      --navy-light: #1c487b;
+      --action-blue: #1f67a8;
+      --action-blue-hover: #175286;
+      --status-pending: #a86509;
+      --status-pending-bg: #fef3c7;
+      --status-pending-border: #fcd34d;
+      --status-reviewed: #147a54;
+      --status-reviewed-bg: #ecfdf5;
+      --status-reviewed-border: #a7f3d0;
+      --bg-light: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+      --radius-card: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header.app-header {
+      background-color: var(--primary-navy);
+      color: #ffffff;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .badge-stats span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-stats .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.pending { background-color: #fbbf24; }
+    .dot.reviewed { background-color: #34d399; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--action-blue);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--action-blue-hover);
+    }
+
+    .btn-outline-white {
+      background: transparent;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-outline-white:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-success {
+      background-color: var(--status-reviewed);
+      color: #ffffff;
+    }
+
+    .btn-success:hover {
+      background-color: #0f5c3f;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* DATA IMPORT BAR */
+    .data-bar {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .data-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 320px;
+    }
+
+    .data-bar-left input[type="text"] {
+      flex: 1;
+      padding: 8px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .data-bar-left input[type="text"]:focus {
+      border-color: var(--action-blue);
+      box-shadow: 0 0 0 3px rgba(31, 103, 168, 0.15);
+    }
+
+    .data-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* MAIN LAYOUT */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 126px);
+      overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .app-sidebar {
+      width: 360px;
+      background: #ffffff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-search-box {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-input-wrapper svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .filter-pill {
+      font-size: 0.76rem;
+      padding: 4px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .filter-pill.active {
+      background: var(--primary-navy);
+      color: #fff;
+      border-color: var(--primary-navy);
+    }
+
+    .filter-status-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .filter-status-btn {
+      flex: 1;
+      text-align: center;
+      font-size: 0.76rem;
+      padding: 5px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .filter-status-btn.active {
+      background: var(--action-blue);
+      color: #ffffff;
+      border-color: var(--action-blue);
+    }
+
+    .sidebar-group-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .group-item-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .group-item-card:hover {
+      border-color: var(--action-blue);
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+
+    .group-item-card.active {
+      border-color: var(--action-blue);
+      box-shadow: 0 0 0 2px rgba(31, 103, 168, 0.2);
+      background: #f0f7ff;
+    }
+
+    .group-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .group-turma-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .group-item-card.active .group-turma-badge {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .group-students-name {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .group-practice-title {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .group-item-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 0.74rem;
+    }
+
+    .version-counter {
+      color: var(--action-blue);
+      font-weight: 500;
+    }
+
+    /* BADGES STATUS */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .status-badge.pending {
+      color: var(--status-pending);
+      background: var(--status-pending-bg);
+      border: 1px solid var(--status-pending-border);
+    }
+
+    .status-badge.reviewed {
+      color: var(--status-reviewed);
+      background: var(--status-reviewed-bg);
+      border: 1px solid var(--status-reviewed-border);
+    }
+
+    /* MAIN CONTENT VIEW */
+    .app-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 36px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 26px;
+      position: relative;
+    }
+
+    /* GROUP BANNER / HEADER CARD */
+    .group-banner-card {
+      border-top: 4px solid var(--action-blue);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .banner-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .banner-title-area h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .banner-meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .banner-meta-tags strong {
+      color: var(--text-main);
+    }
+
+    .banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* VERSION SELECTOR TIMELINE */
+    .version-selector-bar {
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .version-selector-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .version-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .version-pill:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .version-pill.active {
+      background: var(--primary-navy);
+      color: #ffffff;
+      border-color: var(--primary-navy);
+      font-weight: 600;
+    }
+
+    .version-pill .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .version-pill .pill-tag {
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 1px 6px;
+      border-radius: 10px;
+      margin-left: 2px;
+    }
+
+    /* REPORT SECTIONS */
+    .report-section-card {
+      margin-bottom: 2px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+    }
+
+    .section-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: var(--action-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .section-field {
+      margin-bottom: 16px;
+    }
+
+    .section-field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field-content {
+      font-size: 0.94rem;
+      color: var(--text-main);
+      background: #f8fafc;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #edf2f7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+    }
+
+    .highlight-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid var(--status-reviewed);
+      color: #14532d;
+    }
+
+    .problem-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid var(--action-blue);
+      color: #1e3a8a;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .objectives-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .objective-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #edf2f7;
+    }
+
+    .obj-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .obj-text {
+      flex: 1;
+      font-size: 0.92rem;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* AI REVIEW CARD */
+    .ai-review-card {
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--status-pending);
+      transition: all 0.3s ease;
+    }
+
+    .ai-review-card.has-review {
+      border-top-color: var(--status-reviewed);
+    }
+
+    .ai-review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .ai-review-header h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-main);
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    .ai-textarea:focus {
+      border-color: var(--action-blue);
+      box-shadow: 0 0 0 3px rgba(31, 103, 168, 0.15);
+    }
+
+    .ai-review-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-review-info {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .saved-feedback-display {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      color: #166534;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-body p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .export-preview-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: monospace;
+      font-size: 0.84rem;
+      color: #334155;
+      white-space: pre-wrap;
+      max-height: 380px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #f8fafc;
+      border-radius: 0 0 16px 16px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .empty-state svg {
+      width: 54px;
+      height: 54px;
+      stroke: var(--text-light);
+    }
+
+    .empty-state h3 {
+      font-size: 1.15rem;
+      color: var(--text-main);
+    }
+
+    .empty-state p {
+      max-width: 440px;
+      font-size: 0.88rem;
+    }
+
+    /* NOTIFICATION TOAST */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--primary-navy);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success {
+      background: var(--status-reviewed);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* RESPONSIVIDADE — ausente na versão original, causava sobreposição no celular */
+    html, body {
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 1100px) {
+      .app-sidebar {
+        width: 300px;
+      }
+
+      .app-main {
+        padding: 20px 22px 50px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      header.app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 16px;
+      }
+
+      .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .header-actions .btn {
+        flex: 1 1 auto;
+        white-space: nowrap;
+      }
+
+      .badge-stats {
+        flex-wrap: wrap;
+        row-gap: 6px;
+        font-size: 0.76rem;
+        width: 100%;
+      }
+
+      .data-bar {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .data-bar-left {
+        min-width: 0;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .data-bar-right {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .data-bar-right .btn,
+      .data-bar-left .btn {
+        flex: 1 1 auto;
+      }
+
+      /* Sidebar e conteúdo empilham em vez de dividir a largura da tela */
+      .app-container {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+      }
+
+      .app-sidebar {
+        width: 100%;
+        max-height: 46vh;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      .app-main {
+        padding: 14px;
+        gap: 14px;
+      }
+
+      .card {
+        padding: 16px 18px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .brand-text h1 {
+        font-size: 1.05rem;
+      }
+
+      .brand-text p {
+        font-size: 0.74rem;
+      }
+
+      .btn-sm {
+        font-size: 0.74rem;
+        padding: 6px 10px;
+      }
+
+      .badge-stats {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+      }
+    }
+
+    /* PRINT STYLES - MODO DE IMPRESSÃO LIMPO */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt;
+      }
+
+      header.app-header,
+      .data-bar,
+      .app-sidebar,
+      .banner-actions,
+      .version-selector-bar,
+      .ai-review-card .ai-textarea,
+      .ai-review-card .ai-review-footer,
+      .modal-backdrop,
+      .toast-container,
+      .no-print {
+        display: none !important;
+      }
+
+      .app-container {
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      .app-main {
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        border-radius: 0 !important;
+        padding: 14px 18px !important;
+        margin-bottom: 14px !important;
+        page-break-inside: avoid;
+      }
+
+      .group-banner-card {
+        border-top: 3px solid #12345b !important;
+      }
+
+      .print-only-header {
+        display: block !important;
+        border-bottom: 2px solid #12345b;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .print-only-header h1 {
+        font-size: 14pt;
+        color: #12345b;
+        margin-bottom: 4px;
+      }
+
+      .print-only-header p {
+        font-size: 9pt;
+        color: #555;
+      }
+
+      .field-content {
+        background: transparent !important;
+        border: 1px solid #ddd !important;
+        padding: 8px 12px !important;
+      }
+    }
+
+    .print-only-header {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO DA APLICAÇÃO -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">TCC</div>
+      <div class="brand-text">
+        <h1>Painel de Acompanhamento de TCC</h1>
+        <p>CETEP/LNAB • Relatórios Individuais de Submissão e Pareceres</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="badge-stats" id="statsBadge">
+        <span><strong id="totalGroupsCount">0</strong> Grupos</span>
+        <span>•</span>
+        <span><strong id="totalSubmissionsCount">0</strong> Versões</span>
+        <span>•</span>
+        <span><span class="dot pending"></span> <strong id="pendingCount">0</strong> Pendentes</span>
+        <span>•</span>
+        <span><span class="dot reviewed"></span> <strong id="reviewedCount">0</strong> Revisados</span>
+      </div>
+
+      <button class="btn btn-outline-white btn-sm" onclick="triggerPrint()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-8 0v4h8v-4H8z"/></svg>
+        Imprimir / PDF
+      </button>
+
+      <button class="btn btn-outline-white btn-sm" onclick="exportAllFeedbackJSON()" title="Fazer backup de todos os pareceres salvos">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Backup Pareceres
+      </button>
+
+      <button class="btn btn-outline-white btn-sm" onclick="document.getElementById('restoreBackupInput').click()" title="Restaurar pareceres de um arquivo de backup">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 8V7a3 3 0 013-3h10a3 3 0 013 3v1m-4 4l-4-4m0 0l-4 4m4-4v12"/></svg>
+        Restaurar Backup
+      </button>
+      <input type="file" id="restoreBackupInput" accept="application/json,.json" style="display:none" onchange="restoreFeedbackJSON(event)">
+    </div>
+  </header>
+
+  <!-- BARRA DE IMPORTAÇÃO E FONTE DE DADOS -->
+  <div class="data-bar">
+    <div class="data-bar-left">
+      <input type="text" id="sheetUrlInput" placeholder="Cole o link do Google Sheets (ex: https://docs.google.com/spreadsheets/d/...)">
+      <button class="btn btn-primary btn-sm" onclick="loadFromGoogleSheetsUrl()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v16h16V4H4zm4 4h8m-8 4h8m-8 4h5"/></svg>
+        Conectar Planilha
+      </button>
+    </div>
+
+    <div class="data-bar-right">
+      <label class="btn btn-secondary btn-sm" style="margin-bottom:0;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+        Subir CSV
+        <input type="file" id="csvFileInput" accept=".csv, .tsv, .txt" style="display:none;" onchange="handleFileUpload(event)">
+      </label>
+
+      <button class="btn btn-secondary btn-sm" onclick="openPasteModal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Colar Dados
+      </button>
+
+      <button class="btn btn-secondary btn-sm" onclick="loadSampleData()" style="border-color: #93c5fd; color: #1e40af; background: #eff6ff;">
+        ★ Carregar Exemplo Demonstrativo
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div class="app-container">
+    
+    <!-- SIDEBAR COM LISTA DE GRUPOS -->
+    <aside class="app-sidebar">
+      <div class="sidebar-search-box">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar por estudante, e-mail..." oninput="renderGroupList()">
+        </div>
+
+        <div class="filter-pills" id="turmaFilterContainer">
+          <button class="filter-pill active" onclick="setTurmaFilter('TODAS')">Todas</button>
+        </div>
+
+        <div class="filter-status-row">
+          <button class="filter-status-btn active" onclick="setStatusFilter('ALL')">Todos</button>
+          <button class="filter-status-btn" onclick="setStatusFilter('PENDING')">Pendentes</button>
+          <button class="filter-status-btn" onclick="setStatusFilter('REVIEWED')">Revisados</button>
+        </div>
+      </div>
+
+      <div class="sidebar-group-list" id="groupListContainer">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </aside>
+
+    <!-- ÁREA DE VISUALIZAÇÃO DO RELATÓRIO -->
+    <main class="app-main" id="mainContentArea">
+      <div class="empty-state" id="emptyStatePlaceholder">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+        <h3>Nenhum grupo selecionado</h3>
+        <p>Conecte uma planilha do Google Sheets, faça upload do CSV de respostas ou clique em <strong>"Carregar Exemplo Demonstrativo"</strong> para visualizar os relatórios e histórico de versões.</p>
+      </div>
+
+      <div id="reportContainer" style="display: none; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- CABEÇALHO EXCLUSIVO PARA IMPRESSÃO -->
+        <div class="print-only-header">
+          <h1>CENTRO TERRITORIAL DE EDUCAÇÃO PROFISSIONAL DO LITORAL NORTE E AGRESTE BAIANO - CETEP/LNAB</h1>
+          <p>Relatório de Acompanhamento de Projeto de TCC • Educação Profissional e Tecnológica (EPT)</p>
+          <p id="printGeneratedDate" style="margin-top: 4px; font-weight: bold;"></p>
+        </div>
+
+        <!-- BANNER DE IDENTIFICAÇÃO DO GRUPO -->
+        <div class="card group-banner-card">
+          <div class="banner-top-row">
+            <div class="banner-title-area">
+              <h2 id="reportProjectTitle">Título do Trabalho de Conclusão de Curso</h2>
+              <div class="banner-meta-tags">
+                <span>Turma: <strong id="reportTurmaBadge">2TACM1</strong></span>
+                <span>•</span>
+                <span>Estudantes: <strong id="reportStudents">Nomes dos Estudantes</strong></span>
+                <span>•</span>
+                <span>E-mail: <strong id="reportEmail">email@grupo.com</strong></span>
+              </div>
+            </div>
+
+            <div class="banner-actions">
+              <button class="btn btn-primary" onclick="openExportModal()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                Exportar para análise
+              </button>
+
+              <button class="btn btn-secondary" onclick="triggerPrint()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Imprimir
+              </button>
+            </div>
+          </div>
+
+          <!-- SELETOR DE VERSÕES CRONOLÓGICAS -->
+          <div class="version-selector-bar">
+            <div class="version-selector-title">Histórico de Versões Enviadas (Ordem Cronológica)</div>
+            <div class="version-pills" id="versionPillsContainer">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 1: SELEÇÃO DA PRÁTICA -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">1</span>
+              <span>1. Seleção da Prática</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Prática Escolhida</div>
+            <div class="field-content highlight-box" id="sec1Pratica"></div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 2: PROBLEMATIZAÇÃO -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">2</span>
+              <span>2. Problematização</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Aspecto Não Aprofundado na Prática</div>
+            <div class="field-content" id="sec2Aspecto"></div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Problema de Investigação</div>
+            <div class="field-content problem-box" id="sec2Problema"></div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 3: OBJETIVOS -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">3</span>
+              <span>3. Objetivos</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Objetivo Geral</div>
+            <div class="field-content" id="sec3ObjetivoGeral" style="font-weight: 500;"></div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Objetivos Específicos</div>
+            <div class="objectives-list">
+              <div class="objective-item">
+                <span class="obj-badge">Obj. 1</span>
+                <div class="obj-text" id="sec3Obj1"></div>
+              </div>
+              <div class="objective-item">
+                <span class="obj-badge">Obj. 2</span>
+                <div class="obj-text" id="sec3Obj2"></div>
+              </div>
+              <div class="objective-item">
+                <span class="obj-badge">Obj. 3</span>
+                <div class="obj-text" id="sec3Obj3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 4: INVESTIGAÇÃO NA LITERATURA -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">4</span>
+              <span>4. Investigação na Literatura</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Referências Utilizadas (Formato ABNT)</div>
+            <div class="field-content" id="sec4Referencias"></div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Como Essas Referências se Relacionam com os Resultados Observados</div>
+            <div class="field-content" id="sec4Relacao"></div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 5: RESULTADOS E DISCUSSÃO -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">5</span>
+              <span>5. Resultados e Discussão</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Síntese da Discussão</div>
+            <div class="field-content" id="sec5Discussao"></div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 6: APLICABILIDADE, TÍTULO E CONCLUSÃO -->
+        <div class="card report-section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-number">6</span>
+              <span>6. Aplicabilidade, Título e Conclusão</span>
+            </div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Título do Trabalho</div>
+            <div class="field-content" id="sec6Titulo" style="font-weight: 600;"></div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Aplicabilidade e Impacto</div>
+            <div class="field-content" id="sec6Aplicabilidade"></div>
+          </div>
+
+          <div class="section-field">
+            <div class="field-label">Conclusão</div>
+            <div class="field-content" id="sec6Conclusao"></div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO DE VINCULAÇÃO DO RETORNO DA IA -->
+        <div class="card ai-review-card" id="aiReviewCard">
+          <div class="ai-review-header">
+            <h3>
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              Parecer / Devolutiva Pedagógica da IA para esta Versão
+            </h3>
+            <span class="status-badge pending" id="versionStatusBadge">Pendente de Avaliação</span>
+          </div>
+
+          <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 10px;">
+            Cole aqui a devolutiva gerada pelo seu assistente de IA (ChatGPT, Gemini, Claude) após utilizar o botão <em>'Exportar para análise'</em>. O parecer ficará vinculado de forma permanente a esta versão específica para consulta do professor e dos alunos.
+          </p>
+
+          <textarea class="ai-textarea" id="aiFeedbackTextarea" placeholder="Cole aqui o texto da análise de IA correspondente a esta versão do trabalho..."></textarea>
+
+          <div class="ai-review-footer">
+            <div class="ai-review-info" id="aiSavedTimestamp">Nenhum parecer salvo nesta versão ainda.</div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary btn-sm" onclick="clearAiFeedback()">Limpar</button>
+              <button class="btn btn-primary btn-sm" onclick="saveAiFeedback()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                Salvar Parecer desta Versão
+              </button>
+            </div>
+          </div>
+
+          <div id="savedFeedbackDisplay" class="saved-feedback-display" style="display: none;">
+            <!-- Exibição renderizada para leitura e impressão -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: EXPORTAR PARA ANÁLISE IA -->
+  <div class="modal-backdrop" id="exportModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Exportar Versão para Assistente de IA</h3>
+        <button class="modal-close" onclick="closeExportModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>O texto abaixo foi gerado em <strong>formato simples e limpo (texto corrido, sem HTML)</strong>, estruturado com um cabeçalho pedagógico para você colar diretamente em um assistente de IA (Gemini, ChatGPT, Claude).</p>
+        
+        <div class="export-preview-box" id="exportPlainTextContent"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeExportModal()">Fechar</button>
+        <button class="btn btn-secondary" onclick="downloadPlainText()">Baixar .txt</button>
+        <button class="btn btn-primary" onclick="copyExportText()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+          Copiar Texto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: COLAR DADOS CSV / TSV -->
+  <div class="modal-backdrop" id="pasteModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Colar Dados de Respostas (CSV ou TSV)</h3>
+        <button class="modal-close" onclick="closePasteModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Copie e cole diretamente as células da sua planilha do Google Sheets ou arquivo CSV de respostas do Forms:</p>
+        <textarea id="pasteDataTextarea" class="ai-textarea" style="min-height: 220px; font-family: monospace; font-size: 0.82rem;" placeholder="Cole aqui os dados com cabeçalho (ex: Carimbo de data/hora, E-mail, Turma, Estudantes do grupo...)"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePasteModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="processPastedData()">Processar e Importar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE TOASTS DE NOTIFICAÇÃO -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- LÓGICA JAVASCRIPT COMPLETA DA APLICAÇÃO -->
+  <script>
+    // ESTADO GLOBAL DA APLICAÇÃO
+    const state = {
+      rawRows: [],
+      groups: {}, // Chave: ID do grupo -> { id, key, turma, students, email, submissions: [ ... ] }
+      sortedGroupIds: [],
+      activeGroupId: null,
+      activeVersionIndex: 0,
+      filterTurma: 'TODAS',
+      filterStatus: 'ALL', // 'ALL', 'PENDING', 'REVIEWED'
+      searchQuery: '',
+      aiReviews: {} // Chave: groupId_versionIndex -> { feedback, savedAt }
+    };
+
+    // INICIALIZAÇÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedReviewsFromStorage();
+      loadSampleData(); // Inicia com dados de exemplo prontos para visualização imediata
+    });
+
+    // SISTEMA DE TOAST
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'success' ? 'success' : ''}`;
+      toast.innerHTML = `
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // PERSISTÊNCIA LOCAL DOS PARECERES DA IA
+    const AI_REVIEWS_SCHEMA_VERSION = 1;
+
+    function loadSavedReviewsFromStorage() {
+      try {
+        const stored = localStorage.getItem('tcc_app_ai_reviews');
+        if (!stored) return;
+        const parsed = JSON.parse(stored);
+        // Compatibilidade: versões antigas gravavam o objeto de pareceres direto,
+        // sem envelope de schemaVersion. Aceita os dois formatos.
+        if (parsed && typeof parsed === 'object' && parsed.schemaVersion && parsed.reviews) {
+          state.aiReviews = parsed.reviews;
+        } else {
+          state.aiReviews = parsed || {};
+        }
+      } catch (e) {
+        console.error('Erro ao ler localStorage:', e);
+      }
+    }
+
+    function persistReviewsToStorage() {
+      try {
+        const envelope = {
+          schemaVersion: AI_REVIEWS_SCHEMA_VERSION,
+          atualizadoEm: new Date().toISOString(),
+          reviews: state.aiReviews
+        };
+        localStorage.setItem('tcc_app_ai_reviews', JSON.stringify(envelope));
+      } catch (e) {
+        console.error('Erro ao salvar no localStorage:', e);
+      }
+    }
+
+    // PARSER ROBUSTO DE CSV / TSV
+    function parseCSV(text) {
+      if (!text || !text.trim()) return [];
+      
+      const lines = [];
+      let row = [];
+      let currentVal = '';
+      let inQuotes = false;
+      
+      // Detecta separador predominante na primeira linha
+      const firstLine = text.split(/\r?\n/)[0] || '';
+      let delimiter = ',';
+      const commaCount = (firstLine.match(/,/g) || []).length;
+      const tabCount = (firstLine.match(/\t/g) || []).length;
+      const semiCount = (firstLine.match(/;/g) || []).length;
+      
+      if (tabCount > commaCount && tabCount > semiCount) delimiter = '\t';
+      else if (semiCount > commaCount) delimiter = ';';
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+
+        if (char === '"' || char === "'") {
+          if (inQuotes && nextChar === char) {
+            currentVal += char;
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === delimiter && !inQuotes) {
+          row.push(currentVal.trim());
+          currentVal = '';
+        } else if ((char === '\r' || char === '\n') && !inQuotes) {
+          if (char === '\r' && nextChar === '\n') i++;
+          row.push(currentVal.trim());
+          if (row.some(cell => cell.length > 0)) {
+            lines.push(row);
+          }
+          row = [];
+          currentVal = '';
+        } else {
+          currentVal += char;
+        }
+      }
+
+      if (currentVal.length > 0 || row.length > 0) {
+        row.push(currentVal.trim());
+        if (row.some(cell => cell.length > 0)) {
+          lines.push(row);
+        }
+      }
+
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].map(h => normalizeHeader(h));
+      const results = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const obj = {};
+        for (let j = 0; j < headers.length; j++) {
+          const key = headers[j];
+          obj[key] = line[j] || '';
+        }
+        results.push(obj);
+      }
+
+      return results;
+    }
+
+    function normalizeHeader(h) {
+      const lower = h.toLowerCase().trim()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove acentos
+      
+      if (lower.includes('carimbo') || lower.includes('timestamp') || lower.includes('data')) return 'carimbo';
+      if (lower.includes('e-mail') || lower.includes('email')) return 'email';
+      if (lower.includes('turma')) return 'turma';
+      if (lower.includes('estudante') || lower.includes('alunos') || lower.includes('integrantes') || lower.includes('membros')) return 'estudantes';
+      if (lower.includes('pratica')) return 'pratica';
+      if (lower.includes('aspecto') || lower.includes('nao aprofundado')) return 'aspecto';
+      if (lower.includes('problema') || lower.includes('investigacao')) return 'problema';
+      if (lower.includes('geral')) return 'obj_geral';
+      if (lower.includes('especifico 1') || lower.includes('especifico 01') || lower.includes('especifico1')) return 'obj_esp_1';
+      if (lower.includes('especifico 2') || lower.includes('especifico 02') || lower.includes('especifico2')) return 'obj_esp_2';
+      if (lower.includes('especifico 3') || lower.includes('especifico 03') || lower.includes('especifico3')) return 'obj_esp_3';
+      if (lower.includes('referencia') && !lower.includes('relacao')) return 'referencias';
+      if (lower.includes('relacao') || lower.includes('relacionam')) return 'relacao_ref';
+      if (lower.includes('sintese') || lower.includes('discussao')) return 'discussao';
+      if (lower.includes('titulo')) return 'titulo';
+      if (lower.includes('aplicabilidade') || lower.includes('impacto')) return 'aplicabilidade';
+      if (lower.includes('conclusao')) return 'conclusao';
+      return lower;
+    }
+
+    // PROCESSA LINHAS E AGRUPA POR GRUPO DE TCC COM HISTÓRICO CRONOLÓGICO
+    function processSubmissions(rows) {
+      state.rawRows = rows;
+      state.groups = {};
+
+      rows.forEach((row, index) => {
+        const students = (row['estudantes'] || 'Grupo Sem Nome').trim();
+        const email = (row['email'] || '').trim().toLowerCase();
+        const turma = (row['turma'] || 'Sem Turma').trim();
+        
+        // Chave de agrupamento: preferência por Estudantes normalizados, fallback e-mail
+        const normKey = students.toLowerCase().replace(/[^a-z0-9]/g, '') || email;
+        const groupId = normKey;
+
+        if (!state.groups[groupId]) {
+          state.groups[groupId] = {
+            id: groupId,
+            key: normKey,
+            turma: turma,
+            students: students,
+            email: email,
+            submissions: []
+          };
+        }
+
+        // Tenta parsear a data para ordenação cronológica
+        const timestampRaw = row['carimbo'] || '';
+        const parsedDate = parseDateString(timestampRaw);
+
+        state.groups[groupId].submissions.push({
+          raw: row,
+          timestampRaw: timestampRaw,
+          timestampMs: parsedDate ? parsedDate.getTime() : (index * 1000),
+          formattedDate: parsedDate ? formatDatePretty(parsedDate) : timestampRaw,
+          pratica: row['pratica'] || 'Não informado',
+          aspecto: row['aspecto'] || 'Não informado',
+          problema: row['problema'] || 'Não informado',
+          objGeral: row['obj_geral'] || 'Não informado',
+          objEsp1: row['obj_esp_1'] || 'Não informado',
+          objEsp2: row['obj_esp_2'] || 'Não informado',
+          objEsp3: row['obj_esp_3'] || 'Não informado',
+          referencias: row['referencias'] || 'Não informado',
+          relacaoRef: row['relacao_ref'] || 'Não informado',
+          discussao: row['discussao'] || 'Não informado',
+          titulo: row['titulo'] || 'Projeto sem título',
+          aplicabilidade: row['aplicabilidade'] || 'Não informado',
+          conclusao: row['conclusao'] || 'Não informado'
+        });
+      });
+
+      // Ordena as submissões de cada grupo rigorosamente em ordem cronológica crescente
+      Object.values(state.groups).forEach(grp => {
+        grp.submissions.sort((a, b) => a.timestampMs - b.timestampMs);
+        // Atualiza turma e estudantes com a versão mais recente
+        const latest = grp.submissions[grp.submissions.length - 1];
+        if (latest.raw['turma']) grp.turma = latest.raw['turma'].trim();
+        if (latest.raw['estudantes']) grp.students = latest.raw['estudantes'].trim();
+        if (latest.raw['email']) grp.email = latest.raw['email'].trim();
+      });
+
+      // Lista de grupos ordenada alfabeticamente por estudante
+      state.sortedGroupIds = Object.keys(state.groups).sort((a, b) => {
+        return state.groups[a].students.localeCompare(state.groups[b].students);
+      });
+
+      updateTurmaFilters();
+      updateHeaderStats();
+
+      // Seleciona o primeiro grupo por padrão
+      if (state.sortedGroupIds.length > 0) {
+        selectGroup(state.sortedGroupIds[0]);
+      } else {
+        document.getElementById('reportContainer').style.display = 'none';
+        document.getElementById('emptyStatePlaceholder').style.display = 'flex';
+      }
+
+      renderGroupList();
+    }
+
+    function parseDateString(str) {
+      if (!str) return null;
+      // Formato brasileiro comum de forms: DD/MM/YYYY HH:mm:ss ou YYYY-MM-DD
+      const brMatch = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+      if (brMatch) {
+        const day = parseInt(brMatch[1], 10);
+        const month = parseInt(brMatch[2], 10) - 1;
+        const year = parseInt(brMatch[3], 10);
+        const hour = parseInt(brMatch[4] || '0', 10);
+        const min = parseInt(brMatch[5] || '0', 10);
+        const sec = parseInt(brMatch[6] || '0', 10);
+        return new Date(year, month, day, hour, min, sec);
+      }
+      const iso = new Date(str);
+      if (!isNaN(iso.getTime())) return iso;
+      return null;
+    }
+
+    function formatDatePretty(date) {
+      if (!date || isNaN(date.getTime())) return '';
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(date.getDate())}/${pad(date.getMonth()+1)}/${date.getFullYear()} às ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    // ATUALIZAÇÃO DOS FILTROS DE TURMA
+    function updateTurmaFilters() {
+      const container = document.getElementById('turmaFilterContainer');
+      const turmas = new Set();
+      Object.values(state.groups).forEach(g => {
+        if (g.turma) turmas.add(g.turma);
+      });
+
+      const sortedTurmas = Array.from(turmas).sort();
+      let html = `<button class="filter-pill ${state.filterTurma === 'TODAS' ? 'active' : ''}" onclick="setTurmaFilter('TODAS')">Todas</button>`;
+      sortedTurmas.forEach(t => {
+        html += `<button class="filter-pill ${state.filterTurma === t ? 'active' : ''}" onclick="setTurmaFilter('${t}')">${t}</button>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function setTurmaFilter(turma) {
+      state.filterTurma = turma;
+      updateTurmaFilters();
+      renderGroupList();
+    }
+
+    function setStatusFilter(status) {
+      state.filterStatus = status;
+      document.querySelectorAll('.filter-status-btn').forEach(btn => btn.classList.remove('active'));
+      const activeIdx = status === 'ALL' ? 0 : status === 'PENDING' ? 1 : 2;
+      document.querySelectorAll('.filter-status-btn')[activeIdx].classList.add('active');
+      renderGroupList();
+    }
+
+    // VERIFICA STATUS DO GRUPO (SE TEM OU NÃO PARECER SALVO NA VERSÃO MAIS RECENTE OU EM TODAS)
+    function getGroupStatus(groupId) {
+      const group = state.groups[groupId];
+      if (!group || group.submissions.length === 0) return 'PENDING';
+      // Status baseado na versão mais recente
+      const latestIdx = group.submissions.length - 1;
+      const key = `${groupId}_${latestIdx}`;
+      return (state.aiReviews[key] && state.aiReviews[key].feedback && state.aiReviews[key].feedback.trim()) ? 'REVIEWED' : 'PENDING';
+    }
+
+    function getVersionStatus(groupId, versionIndex) {
+      const key = `${groupId}_${versionIndex}`;
+      return (state.aiReviews[key] && state.aiReviews[key].feedback && state.aiReviews[key].feedback.trim()) ? 'REVIEWED' : 'PENDING';
+    }
+
+    // RENDERIZAÇÃO DA LISTA DE GRUPOS NA SIDEBAR
+    function renderGroupList() {
+      const container = document.getElementById('groupListContainer');
+      const query = (document.getElementById('searchInput').value || '').toLowerCase();
+
+      const filtered = state.sortedGroupIds.filter(id => {
+        const group = state.groups[id];
+        // Filtro por turma
+        if (state.filterTurma !== 'TODAS' && group.turma !== state.filterTurma) return false;
+        // Filtro por status
+        const status = getGroupStatus(id);
+        if (state.filterStatus !== 'ALL' && status !== state.filterStatus) return false;
+        // Busca textual
+        if (query) {
+          const matchStudent = group.students.toLowerCase().includes(query);
+          const matchEmail = group.email.toLowerCase().includes(query);
+          const latest = group.submissions[group.submissions.length - 1];
+          const matchTitle = latest.titulo.toLowerCase().includes(query);
+          const matchPratica = latest.pratica.toLowerCase().includes(query);
+          if (!matchStudent && !matchEmail && !matchTitle && !matchPratica) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            Nenhum grupo encontrado com os filtros selecionados.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(id => {
+        const group = state.groups[id];
+        const isActive = id === state.activeGroupId;
+        const totalVers = group.submissions.length;
+        const latest = group.submissions[totalVers - 1];
+        const status = getGroupStatus(id);
+
+        html += `
+          <div class="group-item-card ${isActive ? 'active' : ''}" onclick="selectGroup('${id}')">
+            <div class="group-item-header">
+              <span class="group-turma-badge">${escapeHtml(group.turma)}</span>
+              <span class="status-badge ${status === 'REVIEWED' ? 'reviewed' : 'pending'}">
+                ${status === 'REVIEWED' ? '✓ Revisado' : '● Pendente'}
+              </span>
+            </div>
+            <div class="group-students-name">${escapeHtml(group.students)}</div>
+            <div class="group-practice-title" title="${escapeHtml(latest.titulo)}">${escapeHtml(latest.titulo || latest.pratica)}</div>
+            <div class="group-item-footer">
+              <span class="version-counter">${totalVers} ${totalVers === 1 ? 'versão' : 'versões'}</span>
+              <span style="color: var(--text-muted);">${escapeHtml(latest.formattedDate || latest.timestampRaw)}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateHeaderStats();
+    }
+
+    // ATUALIZA ESTATÍSTICAS NO CABEÇALHO
+    function updateHeaderStats() {
+      const allIds = state.sortedGroupIds;
+      const totalGroups = allIds.length;
+      let totalSubs = 0;
+      let reviewed = 0;
+      let pending = 0;
+
+      allIds.forEach(id => {
+        const grp = state.groups[id];
+        totalSubs += grp.submissions.length;
+        if (getGroupStatus(id) === 'REVIEWED') reviewed++;
+        else pending++;
+      });
+
+      document.getElementById('totalGroupsCount').textContent = totalGroups;
+      document.getElementById('totalSubmissionsCount').textContent = totalSubs;
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('reviewedCount').textContent = reviewed;
+    }
+
+    // SELECIONA UM GRUPO E ABRE O RELATÓRIO
+    function selectGroup(groupId) {
+      state.activeGroupId = groupId;
+      const group = state.groups[groupId];
+      if (!group) return;
+
+      // Abre por padrão na versão mais recente (última submissão cronológica)
+      state.activeVersionIndex = group.submissions.length - 1;
+
+      renderGroupList();
+      renderReport();
+    }
+
+    // SELECIONA UMA VERSÃO ESPECÍFICA DO GRUPO
+    function selectVersion(idx) {
+      state.activeVersionIndex = idx;
+      renderReport();
+    }
+
+    // RENDERIZA O RELATÓRIO INDIVIDUAL DO GRUPO (NAS 6 SEÇÕES ESPECIFICADAS)
+    function renderReport() {
+      const groupId = state.activeGroupId;
+      const group = state.groups[groupId];
+      if (!group || group.submissions.length === 0) return;
+
+      document.getElementById('emptyStatePlaceholder').style.display = 'none';
+      const container = document.getElementById('reportContainer');
+      container.style.display = 'flex';
+
+      const versionIdx = state.activeVersionIndex;
+      const sub = group.submissions[versionIdx];
+      const totalVers = group.submissions.length;
+      const isLatest = versionIdx === totalVers - 1;
+
+      // Atualiza data no cabeçalho de impressão
+      document.getElementById('printGeneratedDate').textContent = 
+        `Data da Emissão: ${new Date().toLocaleDateString('pt-BR')} • Versão ${versionIdx + 1} de ${totalVers} (Submetida em: ${sub.formattedDate || sub.timestampRaw})`;
+
+      // Banner do Grupo
+      document.getElementById('reportProjectTitle').textContent = sub.titulo || 'Trabalho de Conclusão de Curso';
+      document.getElementById('reportTurmaBadge').textContent = group.turma;
+      document.getElementById('reportStudents').textContent = group.students;
+      document.getElementById('reportEmail').textContent = group.email || 'Não informado';
+
+      // Renderiza as Pílulas do Histórico Cronológico de Versões
+      const pillsContainer = document.getElementById('versionPillsContainer');
+      let pillsHtml = '';
+      group.submissions.forEach((s, idx) => {
+        const isCurrent = idx === versionIdx;
+        const sIsLatest = idx === totalVers - 1;
+        const vStatus = getVersionStatus(groupId, idx);
+        
+        pillsHtml += `
+          <button class="version-pill ${isCurrent ? 'active' : ''}" onclick="selectVersion(${idx})">
+            <span class="pill-dot" style="background: ${vStatus === 'REVIEWED' ? '#147a54' : '#a86509'};"></span>
+            <span>Versão ${idx + 1}</span>
+            <span style="font-size: 0.72rem; opacity: 0.85;">(${s.formattedDate || s.timestampRaw})</span>
+            ${sIsLatest ? '<span class="pill-tag">Atual ⭐</span>' : ''}
+          </button>
+        `;
+      });
+      pillsContainer.innerHTML = pillsHtml;
+
+      // 1. SELEÇÃO DA PRÁTICA
+      document.getElementById('sec1Pratica').textContent = sub.pratica;
+
+      // 2. PROBLEMATIZAÇÃO
+      document.getElementById('sec2Aspecto').textContent = sub.aspecto;
+      document.getElementById('sec2Problema').textContent = sub.problema;
+
+      // 3. OBJETIVOS
+      document.getElementById('sec3ObjetivoGeral').textContent = sub.objGeral;
+      document.getElementById('sec3Obj1').textContent = sub.objEsp1;
+      document.getElementById('sec3Obj2').textContent = sub.objEsp2;
+      document.getElementById('sec3Obj3').textContent = sub.objEsp3;
+
+      // 4. INVESTIGAÇÃO NA LITERATURA
+      document.getElementById('sec4Referencias').textContent = sub.referencias;
+      document.getElementById('sec4Relacao').textContent = sub.relacaoRef;
+
+      // 5. RESULTADOS E DISCUSSÃO
+      document.getElementById('sec5Discussao').textContent = sub.discussao;
+
+      // 6. APLICABILIDADE, TÍTULO E CONCLUSÃO
+      document.getElementById('sec6Titulo').textContent = sub.titulo;
+      document.getElementById('sec6Aplicabilidade').textContent = sub.aplicabilidade;
+      document.getElementById('sec6Conclusao').textContent = sub.conclusao;
+
+      // SEÇÃO DE PARECER DA IA
+      renderAiFeedbackSection(groupId, versionIdx);
+    }
+
+    // RENDERIZAÇÃO DA SEÇÃO DE RETORNO DA IA PARA A VERSÃO ATIVA
+    function renderAiFeedbackSection(groupId, versionIdx) {
+      const key = `${groupId}_${versionIdx}`;
+      const saved = state.aiReviews[key];
+      const textarea = document.getElementById('aiFeedbackTextarea');
+      const badge = document.getElementById('versionStatusBadge');
+      const timestampLabel = document.getElementById('aiSavedTimestamp');
+      const displayBox = document.getElementById('savedFeedbackDisplay');
+      const card = document.getElementById('aiReviewCard');
+
+      if (saved && saved.feedback && saved.feedback.trim()) {
+        textarea.value = saved.feedback;
+        badge.className = 'status-badge reviewed';
+        badge.textContent = '✓ Parecer Salvo (Revisado)';
+        timestampLabel.textContent = `Salvo em: ${saved.savedAt || 'Data recente'}`;
+        card.classList.add('has-review');
+        
+        displayBox.style.display = 'block';
+        displayBox.innerHTML = `<strong>Parecer Registrado para o Grupo:</strong><br><br>${escapeHtml(saved.feedback).replace(/\n/g, '<br>')}`;
+      } else {
+        textarea.value = '';
+        badge.className = 'status-badge pending';
+        badge.textContent = '● Pendente de Avaliação';
+        timestampLabel.textContent = 'Nenhum parecer salvo nesta versão ainda.';
+        card.classList.remove('has-review');
+        displayBox.style.display = 'none';
+      }
+    }
+
+    // SALVA PARECER DA IA PARA A VERSÃO ATUAL
+    function saveAiFeedback() {
+      const groupId = state.activeGroupId;
+      const versionIdx = state.activeVersionIndex;
+      if (!groupId) return;
+
+      const textarea = document.getElementById('aiFeedbackTextarea');
+      const text = textarea.value.trim();
+      const key = `${groupId}_${versionIdx}`;
+
+      if (!text) {
+        showToast('O campo de parecer está vazio.', 'info');
+        return;
+      }
+
+      state.aiReviews[key] = {
+        feedback: text,
+        savedAt: new Date().toLocaleString('pt-BR')
+      };
+
+      persistReviewsToStorage();
+      renderAiFeedbackSection(groupId, versionIdx);
+      renderGroupList();
+      showToast('Parecer pedagógico vinculado com sucesso à Versão ' + (versionIdx + 1) + '!', 'success');
+    }
+
+    // LIMPA O PARECER
+    function clearAiFeedback() {
+      const groupId = state.activeGroupId;
+      const versionIdx = state.activeVersionIndex;
+      if (!groupId) return;
+
+      if (confirm('Deseja realmente remover o parecer desta versão?')) {
+        const key = `${groupId}_${versionIdx}`;
+        delete state.aiReviews[key];
+        persistReviewsToStorage();
+        renderAiFeedbackSection(groupId, versionIdx);
+        renderGroupList();
+        showToast('Parecer removido.', 'info');
+      }
+    }
+
+    // GERAR TEXTO CORRIDO (SEM HTML) PARA EXPORTAR PARA IA
+    function buildPlainTextForAi(groupId, versionIdx) {
+      const group = state.groups[groupId];
+      if (!group) return '';
+      const sub = group.submissions[versionIdx];
+      const total = group.submissions.length;
+
+      return `[AVALIAÇÃO PEDAGÓGICA DE TCC - CETEP/LNAB]
+Você é um orientador e avaliador de Trabalho de Conclusão de Curso (TCC) na Educação Profissional e Tecnológica (EPT).
+Analise a submissão a seguir, avaliando o rigor metodológico, clareza, coerência interna entre o problema, os objetivos e a discussão dos resultados, além da conformidade das referências (normas ABNT). Em seguida, gere um parecer detalhado, formativo e construtivo organizado exatamente nas 6 seções do trabalho, apontando pontos fortes e sugestões pontuais de melhoria para os estudantes.
+
+==================================================
+DADOS DA SUBMISSÃO:
+Turma: ${group.turma}
+Estudantes: ${group.students}
+E-mail de Contato: ${group.email}
+Versão do Envio: Versão ${versionIdx + 1} de ${total}
+Data do Envio: ${sub.formattedDate || sub.timestampRaw}
+Título do Trabalho: ${sub.titulo}
+==================================================
+
+1. SELEÇÃO DA PRÁTICA:
+${sub.pratica}
+
+2. PROBLEMATIZAÇÃO:
+Aspecto Não Aprofundado na Prática:
+${sub.aspecto}
+
+Problema de Investigação:
+${sub.problema}
+
+3. OBJETIVOS:
+Objetivo Geral:
+${sub.objGeral}
+
+Objetivo Específico 1:
+${sub.objEsp1}
+
+Objetivo Específico 2:
+${sub.objEsp2}
+
+Objetivo Específico 3:
+${sub.objEsp3}
+
+4. INVESTIGAÇÃO NA LITERATURA:
+Referências Utilizadas (mínimo 3, formato ABNT):
+${sub.referencias}
+
+Relação das Referências com os Resultados Observados:
+${sub.relacaoRef}
+
+5. RESULTADOS E DISCUSSÃO:
+Síntese da Discussão:
+${sub.discussao}
+
+6. APLICABILIDADE, TÍTULO E CONCLUSÃO:
+Título do Trabalho:
+${sub.titulo}
+
+Aplicabilidade e Impacto Social/Técnico:
+${sub.aplicabilidade}
+
+Conclusão:
+${sub.conclusao}
+==================================================`;
+    }
+
+    // MODAL DE EXPORTAÇÃO
+    function openExportModal() {
+      const groupId = state.activeGroupId;
+      if (!groupId) return;
+      const text = buildPlainTextForAi(groupId, state.activeVersionIndex);
+      document.getElementById('exportPlainTextContent').textContent = text;
+      document.getElementById('exportModal').classList.add('open');
+    }
+
+    function closeExportModal() {
+      document.getElementById('exportModal').classList.remove('open');
+    }
+
+    function copyExportText() {
+      const text = document.getElementById('exportPlainTextContent').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Texto copiado com sucesso! Agora é só colar na sua IA.', 'success');
+      }).catch(() => {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Texto copiado para a área de transferência!', 'success');
+      });
+    }
+
+    function downloadPlainText() {
+      const text = document.getElementById('exportPlainTextContent').textContent;
+      const group = state.groups[state.activeGroupId];
+      const filename = `TCC_Export_${group.turma}_${group.students.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}_V${state.activeVersionIndex + 1}.txt`;
+      
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast('Arquivo baixado com sucesso!', 'success');
+    }
+
+    // MODAL COLAR DADOS
+    function openPasteModal() {
+      document.getElementById('pasteDataTextarea').value = '';
+      document.getElementById('pasteModal').classList.add('open');
+    }
+
+    function closePasteModal() {
+      document.getElementById('pasteModal').classList.remove('open');
+    }
+
+    function processPastedData() {
+      const text = document.getElementById('pasteDataTextarea').value;
+      if (!text.trim()) {
+        showToast('Cole o conteúdo CSV ou TSV antes de continuar.', 'info');
+        return;
+      }
+      const parsed = parseCSV(text);
+      if (parsed.length === 0) {
+        showToast('Não foi possível identificar linhas de dados. Verifique o formato.', 'info');
+        return;
+      }
+      processSubmissions(parsed);
+      closePasteModal();
+      showToast(`${parsed.length} submissões processadas com sucesso!`, 'success');
+    }
+
+    // UPLOAD DE ARQUIVO CSV
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const parsed = parseCSV(text);
+        if (parsed.length === 0) {
+          showToast('Arquivo vazio ou com formato inválido.', 'info');
+          return;
+        }
+        processSubmissions(parsed);
+        showToast(`Arquivo "${file.name}" carregado com sucesso (${parsed.length} registros)!`, 'success');
+      };
+      reader.readAsText(file, 'UTF-8');
+      event.target.value = ''; // reseta
+    }
+
+    // CONECTAR AO GOOGLE SHEETS VIA LINK DIRETO
+    async function loadFromGoogleSheetsUrl() {
+      const rawUrl = document.getElementById('sheetUrlInput').value.trim();
+      if (!rawUrl) {
+        showToast('Por favor, informe o link da sua planilha do Google Sheets.', 'info');
+        return;
+      }
+
+      // Converte URLs normais do Google Sheets para o endpoint CSV exportável.
+      // Links já publicados (contêm "output=csv" ou terminam em "/pub...") não devem
+      // ser reescritos — o formato "/d/e/2PACX-.../pub" não tem o mesmo ID de planilha
+      // do link de edição, e reescrevê-lo gera uma URL inválida.
+      let csvUrl = rawUrl;
+      const jaPublicado = /output=csv/i.test(rawUrl) || /\/pub(\?|$)/i.test(rawUrl);
+
+      if (!jaPublicado) {
+        const match = rawUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        if (match) {
+          const sheetId = match[1];
+          const gidMatch = rawUrl.match(/[#&?]gid=([0-9]+)/);
+          const gid = gidMatch ? gidMatch[1] : '0';
+          csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+        }
+      }
+
+      showToast('Tentando buscar dados da planilha...', 'info');
+
+      try {
+        const res = await fetch(csvUrl);
+        if (!res.ok) throw new Error('Status HTTP ' + res.status);
+        const text = await res.text();
+        const parsed = parseCSV(text);
+        if (parsed.length === 0) throw new Error('Nenhum dado retornado da planilha.');
+        processSubmissions(parsed);
+        showToast('Planilha sincronizada com sucesso!', 'success');
+      } catch (err) {
+        console.warn('Erro no fetch direto:', err);
+        const origemLocal = /^(content|file):$/i.test(window.location.protocol);
+        const avisoOrigem = origemLocal
+          ? "\n\nDetectamos que este arquivo foi aberto direto de um gerenciador de arquivos (endereço começando com 'content://' ou 'file://'). Alguns navegadores bloqueiam esse tipo de acesso à internet nessa condição. Tente abrir o HTML direto pelo navegador (Chrome/Edge) a partir da pasta Downloads, em vez de por um app de arquivos.\n"
+          : "";
+        alert(
+          "Não foi possível ler diretamente a planilha pela internet." + avisoOrigem + "\n\n" +
+          "Soluções rápidas e garantidas:\n" +
+          "1. Na sua planilha do Google Sheets, clique em: Arquivo > Compartilhar > Publicar na Web > Escolha 'Valores separados por vírgula (.csv)' e cole o link gerado aqui.\n" +
+          "OU\n" +
+          "2. Clique em Arquivo > Fazer Download > Valores separados por vírgula (.csv) e use o botão 'Subir CSV'.\n" +
+          "OU\n" +
+          "3. Copie todas as células (Ctrl+A, Ctrl+C) e use o botão 'Colar Dados'."
+        );
+      }
+    }
+
+    // IMPRESSÃO / SALVAR EM PDF LIMPO
+    function triggerPrint() {
+      if (!state.activeGroupId) {
+        showToast('Selecione um grupo para imprimir o relatório.', 'info');
+        return;
+      }
+      window.print();
+    }
+
+    // EXPORTAR BACKUP DOS PARECERES EM JSON
+    function exportAllFeedbackJSON() {
+      const envelope = {
+        schemaVersion: AI_REVIEWS_SCHEMA_VERSION,
+        exportadoEm: new Date().toISOString(),
+        reviews: state.aiReviews
+      };
+      const dataStr = JSON.stringify(envelope, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Backup_Pareceres_TCC_CETEP_${new Date().toISOString().slice(0,10)}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast('Backup dos pareceres exportado em JSON!', 'success');
+    }
+
+    // RESTAURAÇÃO DO BACKUP DE PARECERES
+    function restoreFeedbackJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let parsed;
+        try {
+          parsed = JSON.parse(e.target.result);
+        } catch (err) {
+          showToast('Arquivo inválido: não é um JSON legível.', 'info');
+          event.target.value = '';
+          return;
+        }
+
+        const reviewsRestaurados = (parsed && parsed.schemaVersion && parsed.reviews)
+          ? parsed.reviews
+          : parsed; // aceita também backups antigos, sem envelope
+
+        if (!reviewsRestaurados || typeof reviewsRestaurados !== 'object') {
+          showToast('Arquivo não contém pareceres reconhecíveis.', 'info');
+          event.target.value = '';
+          return;
+        }
+
+        const qtdAtual = Object.keys(state.aiReviews || {}).length;
+        const confirmMsg = qtdAtual > 0
+          ? `Isso vai substituir os ${qtdAtual} pareceres já salvos neste navegador pelos do arquivo. Um backup do estado atual será baixado antes, por segurança. Continuar?`
+          : 'Restaurar os pareceres deste arquivo?';
+
+        if (!confirm(confirmMsg)) {
+          event.target.value = '';
+          return;
+        }
+
+        // Ponto de segurança: baixa o estado atual antes de sobrescrever
+        if (qtdAtual > 0) {
+          exportAllFeedbackJSON();
+        }
+
+        state.aiReviews = reviewsRestaurados;
+        persistReviewsToStorage();
+        renderGroupList();
+        renderReport();
+        showToast('Pareceres restaurados com sucesso!', 'success');
+        event.target.value = '';
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // DADOS DE EXEMPLO DEMONSTRATIVOS (BASEADOS EM CASOS REAIS DO CETEP/LNAB - 2TACM1, 2TACM2, 2TACV1)
+    function loadSampleData() {
+      const sampleCsv = `Carimbo de data/hora,E-mail,Turma,Estudantes do grupo,Prática escolhida,Aspecto não aprofundado,Problema de investigação,Objetivo geral,Objetivo específico 1,Objetivo específico 2,Objetivo específico 3,Referências utilizadas,Relação das referências com os resultados,Síntese da discussão,Título do trabalho,Aplicabilidade e impacto,Conclusão
+15/08/2026 09:20:15,alan.camille.tcc@cetep.ba.gov.br,2TACM1,"Alan Santana dos Santos, Camille Ester de Jesus Souza, Julia Medeiros dos Reis",Exame Parasitológico de Fezes (Método de Hoffman-Ponce-Jangler e Faust),Sensibilidade comparativa na detecção de cistos de protozoários em amostras com baixa carga parasitária,Qual a variação na eficácia diagnóstica entre a técnica de sedimentação espontânea e centrífugo-flutuação de Faust em amostras com baixa densidade de cistos de Giardia lamblia?,Comparar a sensibilidade diagnóstica dos métodos de Hoffman e Faust para identificação de cistos de Giardia lamblia em condições de rotina laboratorial do CETEP.,Padronizar a concentração de suspensões fecais de baixa densidade parasitária.,Executar paralelamente as técnicas de sedimentação e centrífugo-flutuação em 30 alíquotas.,Quantificar o tempo médio de execução e a frequência de artefatos visuais que dificultam a leitura microscópica.,"NEVES, David Pereira. Parasitologia Humana. 13. ed. São Paulo: Atheneu, 2016.
+FERREIRA, Marcelo Urbano. Parasitologia Clínica. Rio de Janeiro: Guanabara Koogan, 2019.
+DE CARLI, Geraldo Attilio. Parasitologia Clínica: Seleção de Métodos e Técnicas de Laboratório para o Diagnóstico das Parasitoses Humanas. 2. ed. São Paulo: Atheneu, 2008.",As obras de Neves e Ferreira demonstram que cistos leves sofrem menor lise no sulfato de zinco com densidade 1.180 g/mL, explicando porque a técnica de Faust obteve maior nitidez de campo e menor retenção em detritos nos testes realizados no laboratório.,Observou-se que o método de Faust reduziu em 64% o tempo de varredura microscópica por lâmina devido à menor presença de resíduos fecais coprecipitados. Entretanto, a sensibilidade da sedimentação espontânea manteve-se superior para ovos pesados de helmintos, confirmando a necessidade de complementaridade preconizada pelos manuais do Ministério da Saúde.,Otimização do Diagnóstico Coproparasitológico: Avaliação Crítica das Técnicas de Hoffman e Faust no Âmbito Laboratorial Escolar,Fornece aos futuros técnicos de análises clínicas um protocolo de triagem rápida e de baixo custo, reduzindo erros diagnósticos em comunidades periféricas atendidas por ações comunitárias de saúde.,A centrifugo-flutuação de Faust demonstrou nítida superioridade na identificação de Giardia lamblia, enquanto o método de Hoffman preservou sua importância para helmintoses. A combinação estratégica de ambas as técnicas assegura acurácia laboratorial sem elevar significativamente os custos com reagentes.
+28/08/2026 14:45:10,alan.camille.tcc@cetep.ba.gov.br,2TACM1,"Alan Santana dos Santos, Camille Ester de Jesus Souza, Julia Medeiros dos Reis",Exame Parasitológico de Fezes (Métodos de Hoffman e Faust),Sensibilidade diagnóstica e influência da densidade do sulfato de zinco na integridade morfológica dos cistos de Giardia lamblia,Como a densidade da solução de sulfato de zinco (1.180 vs 1.200 g/mL) afeta a integridade osmótica e a recuperação de cistos de Giardia lamblia no método de Faust?,Avaliar comparativamente o rendimento e a preservação morfológica de cistos de Giardia lamblia submetidos a diferentes densidades de sulfato de zinco frente à sedimentação espontânea.,Aferir densidades de 1.180 e 1.200 g/mL com densímetro calibrado no laboratório do CETEP.,Comparar a contagem de cistos íntegros vs cistos colabados em câmara de Neubauer.,Elaborar um fluxograma de decisão técnica para seleção de métodos coprológicos em laboratórios públicos.,"NEVES, David Pereira. Parasitologia Humana. 13. ed. São Paulo: Atheneu, 2016.
+FERREIRA, Marcelo Urbano. Parasitologia Clínica. Rio de Janeiro: Guanabara Koogan, 2019.
+DE CARLI, Geraldo Attilio. Parasitologia Clínica: Métodos e Técnicas. São Paulo: Atheneu, 2008.
+BRASIL. Ministério da Saúde. Manual de Diagnóstico Laboratorial de Parasitoses de Importância Médica. Brasília: MS, 2021.",A literatura de De Carli adverte que concentrações acima de 1.180 g/mL induzem desidratação osmótica rápida de trofozoítos e cistos finos, o que justificou a deformação observada na leitura com solução a 1.200 g/mL na segunda etapa experimental.,Os dados demonstraram que a densidade de 1.180 g/mL garantiu 92% de integridade da parede cística com contraste satisfatório em lugol fraco. A sedimentação de Hoffman permaneceu como padrão de segurança para coinfecções com Ascaris lumbricoides.,Coproparasitologia Aplicada à EPT: Padronização Crítica e Otimização Morfológica no Diagnóstico de Giardíase,Melhoria imediata nas aulas práticas do módulo de Parasitologia Clínica do CETEP/LNAB e suporte a triagens laboratoriais durante o projeto Saúde na Escola em Alagoinhas.,A solução de sulfato de zinco a 1.180 g/mL representa a faixa ótima de estabilidade osmótica para Giardia lamblia. Conclui-se que o técnico de laboratório deve monitorar a densidade com aerômetro antes do ensaio, unindo a rapidez do Faust com a amplitude do Hoffman.
+12/08/2026 11:05:00,agatha.daniel.tcc@cetep.ba.gov.br,2TACM2,"Agatha Suelen Pitanga de Oliveira, Daniel dos Santos Lopes, Sara Sales de Souza",Coloração de Gram e Identificação Microbiológica,Fatores interferentes na etapa de descoloração com álcool-acetona e idade da colônia bacteriana,De que maneira o tempo de descoloração e a idade do cultivo bacteriano (>48h) influenciam a fidedignidade da caracterização de bactérias Gram-positivas e Gram-negativas?,Investigar o impacto do tempo de contato do descorante álcool-acetona e da senescência da cultura bacteriana na precisão da técnica de Gram.,Avaliar lâminas descoradas em tempos de 5s, 15s e 30s a partir de colônias de Staphylococcus aureus e Escherichia coli.,Comparar culturas jovens (18-24 horas) com culturas envelhecidas (72 horas) quanto à retenção do complexo cristal violeta-iodo.,Determinar o índice de falsos Gram-negativos decorrentes da hiperdescoloração.,"MURRAY, Patrick R.; ROSENTHAL, Ken S.; PFALLER, Michael A. Microbiologia Médica. 8. ed. Rio de Janeiro: Elsevier, 2017.
+TORTORA, Gerard J.; FUNKE, Berdell R.; CASE, Christine L. Microbiologia. 12. ed. Porto Alegre: Artmed, 2017.
+KONEMAN, Elmer W. et al. Diagnóstico Microbiológico: Texto e Atlas Colorido. 7. ed. Rio de Janeiro: Guanabara Koogan, 2018.",Tortora e Murray apontam que a degradação da camada de peptideoglicano em culturas velhas impede o aprisionamento estequiométrico do cristal violeta com o iodo, fundamentando o fenômeno de variabilidade tintorial que observamos nas cepas de 72 horas.,Os testes revelaram que o tempo de descoloração de 15 segundos foi o ideal para espessuras padrão de esfregaço. Amostras descoradas por 30 segundos induziram 78% de classificação errônea de S. aureus como bacilos ou cocos Gram-negativos, alertando para gravidade em condutas clínicas.,Coloração de Gram na Rotina Prática: Análise das Variáveis Críticas de Descoloração e Idade Cultural no CETEP,Criação de um guia visual e mnemônico impresso para a bancada do laboratório de Microbiologia, reduzindo em até 80% as repetições de esfregaços por estudantes em início de estágio.,A correta calibração do tempo de lavagem com álcool-acetona e a rigorosa utilização de culturas entre 18 e 24 horas são requisitos indispensáveis para evitar diagnósticos presuntivos falhos de sepse e infecções bacterianas.
+02/09/2026 16:30:22,agatha.daniel.tcc@cetep.ba.gov.br,2TACM2,"Agatha Suelen Pitanga de Oliveira, Daniel dos Santos Lopes, Sara Sales de Souza",Coloração de Gram e Padronização do Esfregaço Microbiológico,Espessura do esfregaço bacteriano e interferência na cinética de descoloração com álcool-acetona,Em que medida a turvação do inóculo e a espessura da monocamada celular interferem na margem de tolerância da descoloração pelo álcool-acetona na coloração de Gram?,Padronizar uma escala prática de densidade do inóculo bacteriano para garantir a reprodutibilidade da coloração de Gram por discentes de EPT.,Correlacionar a escala 0.5 de McFarland com a espessura macroscópica da gota seca sobre a lâmina.,Monitorar a sensibilidade tintorial frente a descolorações curtas (5s), médias (15s) e excessivas (30s).,Desenvolver uma tabela referencial plastificada de controle de qualidade para o laboratório do CETEP/LNAB.,"MURRAY, Patrick R. Microbiologia Médica. 8. ed. Rio de Janeiro: Elsevier, 2017.
+TORTORA, Gerard J. Microbiologia. 12. ed. Porto Alegre: Artmed, 2017.
+KONEMAN, Elmer W. Diagnóstico Microbiológico. 7. ed. Rio de Janeiro: Guanabara Koogan, 2018.
+CLSI. Principles and Procedures for Blood Cultures; Approved Guideline. CLSI document M47-A. Wayne, PA, 2020.",Murray e Koneman enfatizam que esfregaços densos aprisionam o corante em aglomerados celulares espessos, resistindo à lavagem e gerando falsos Gram-positivos, ao passo que áreas rarefeitas sofrem lise excessiva.,A calibração do esfregaço baseado na turbidez prévia (McFarland 0.5 diluído) permitiu que mesmo variações de 3 a 5 segundos no descorante não desvirtuassem o resultado morfotintorial, comprovando a hipótese do grupo.,Controle de Qualidade Pré-Analítico na Coloração de Gram: Padronização da Densidade do Esfregaço e Cinética de Descoloração,Impacto direto na redução de descarte de lâminas e corantes nos cursos técnicos de Análises Clínicas da rede estadual da Bahia.,A padronização pré-analítica do esfregaço é o fator mais determinante para o sucesso da bacterioscopia. O estudo resultou na confecção de cartões guias de turbidez afixados nos microscópios do laboratório.
+18/08/2026 10:12:40,barbara.elaine.tcc@cetep.ba.gov.br,2TACV1,"Bárbara Natiele da Silva Santos, Elaine Emanuelle Santos Rodrigues, Raqueli Santos Cruz",Determinação Espectrofotofométrica de Glicose e Colesterol,Estabilidade do reagente de cor e interferência de hemólise moderada na leitura por ponto final,Qual o nível de viés analítico introduzido por hemólise induzida na dosagem espectrofotométrica da glicose sérica pelo método enzimático da Glicose Oxidase?,Quantificar a interferência positiva ou negativa de diferentes graus de hemólise na quantificação espectrofotométrica de glicemia sérica.,Produzir um pool de soro controle e aliquotá-lo com concentrações crescentes de lisado eritrocitário.,Realizar dosagens em triplicata no espectrofotômetro a 505 nm.,Comparar os valores com o índice de erro sistemático permitido pelas diretrizes do PNCQ e SBPC/ML.,"BURTIS, Carl A.; BRUNS, David E. Tietz Fundamentos de Química Clínica e Diagnóstico Molecular. 8. ed. Rio de Janeiro: Elsevier, 2019.
+MOTTA, Valter T. Bioquímica Clínica para o Laboratório: Princípios e Interpretações. 5. ed. Rio de Janeiro: MedBook, 2011.
+SOCIEDADE BRASILEIRA DE PATOLOGIA CLÍNICA / MEDICINA LABORATORIAL (SBPC/ML). Recomendações da SBPC/ML: Fatores Pré-Analíticos e Interferentes. Barueri: Manole, 2018.",Motta e Burtis esclarecem que a hemoglobina livre absorve luz na faixa de 400 a 580 nm, sobrepondo-se à quinonaimina formada na reação de Trinder a 505 nm, o que justifica a elevação artificial dos valores obtidos em amostras hemolisadas.,Os resultados experimentais apontaram uma elevação média de 14,2 mg/dL na glicemia para cada cruzes (+/4+) de hemólise macroscópica observada, o que pode induzir falsa classificação de pacientes normoglicêmicos como portadores de glicemia de jejum alterada.,Impacto Pré-Analítico da Hemólise na Dosagem Enzimática de Glicose: Implicações Clínicas e Critérios de Rejeição,Instrumentalizar a triagem de amostras biológicas no posto de coleta do CETEP, estabelecendo critérios visuais objetivos de recusa antes da centrifugação.,A hemólise atua como interferente espectral severo na reação Trinder. Conclui-se que o técnico deve rejeitar amostras hemolisadas para dosagem glicêmica e orientar nova punção venosa conforme os padrões de biossegurança e qualidade.`;
+
+      const parsed = parseCSV(sampleCsv);
+      processSubmissions(parsed);
+
+      // Adiciona um parecer de exemplo salvo para um dos grupos para demonstrar os dois status (#147a54 e #a86509)
+      const firstGroupId = state.sortedGroupIds[0];
+      if (firstGroupId) {
+        state.aiReviews[`${firstGroupId}_0`] = {
+          feedback: `PARECER PEDAGÓGICO - VERSÃO 1:
+1. Seleção da Prática: Excelente contextualização do método coprológico de rotina.
+2. Problematização: O problema de pesquisa está claro, mas pode delimitar melhor a faixa etária ou procedência das amostras.
+3. Objetivos: Os objetivos específicos estão muito operacionais; recomenda-se incluir um objetivo voltado à mensuração de integridade cística.
+4. Literatura: Boas referências em ABNT (Neves, Ferreira, De Carli). Relacionar mais detalhadamente com a densidade de 1.180 g/mL.
+5. Resultados e Discussão: Boa síntese comparativa de tempos de leitura.
+6. Aplicabilidade: Grande relevância para o técnico em Análises Clínicas. Trabalho muito promissor!`,
+          savedAt: '16/08/2026 às 11:30'
+        };
+
+        state.aiReviews[`${firstGroupId}_1`] = {
+          feedback: `PARECER PEDAGÓGICO - VERSÃO 2 (REVISÃO):
+Parabéns ao grupo pela incorporação dos ajustes solicitados na versão inicial!
+1. A delimitação da densidade do sulfato de zinco (1.180 vs 1.200 g/mL) foi um avanço científico significativo.
+2. Os objetivos específicos agora cobrem a integridade morfológica e o fluxograma técnico.
+3. Inclusão precisa do Manual do Ministério da Saúde de 2021 nas referências ABNT.
+4. O trabalho está pronto e aprovado para submissão final e apresentação na EXPOTEC!`,
+          savedAt: '30/08/2026 às 09:15'
+        };
+        persistReviewsToStorage();
+        renderGroupList();
+        renderReport();
+      }
+
+      showToast('Exemplo demonstrativo carregado com sucesso!', 'success');
+    }
+
+    // FUNÇÕES AUXILIARES
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
